@@ -9,9 +9,9 @@ from ui.theme import inject_theme
 
 
 st.set_page_config(
-    page_title="QueryGenie - Login",
-    page_icon="✨",
-    layout="centered",
+    page_title="QueryGenie - Sign in",
+    page_icon="🔮",
+    layout="wide",
     initial_sidebar_state="collapsed",
 )
 

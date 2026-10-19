@@ -1,4 +1,9 @@
-"""Shared visual theme for the QueryGenie UI prototypes."""
+"""Shared visual theme for the QueryGenie UI prototypes.
+
+The palette is intentionally light: white surfaces, a very light blue canvas and
+royal-blue accents. Dark panels and neon-on-black styling are avoided on purpose
+so the UI keeps a premium, modern SaaS feel.
+"""
 
 from __future__ import annotations
 
@@ -14,9 +19,8 @@ CUSTOM_CSS = r"""
     --qg-bg-alt: #F5F8FF;
     --qg-surface: #FFFFFF;
     --qg-primary: #2457E6;
-    --qg-primary-dark: #1B45C4;
+    --qg-primary-dark: #173DB5;
     --qg-secondary: #60A5FA;
-    --qg-teal: #0D9488;
     --qg-text: #172033;
     --qg-text-muted: #64748B;
     --qg-border: #E2E8F0;
@@ -61,13 +65,10 @@ footer,
     from { opacity: 0; transform: translateY(22px); }
     to   { opacity: 1; transform: translateY(0); }
 }
-@keyframes qgFlowPulse {
-    0%, 100% { transform: translateY(0); opacity: 0.85; }
-    50%      { transform: translateY(3px); opacity: 1; }
-}
-@keyframes qgArrowPulse {
-    0%, 100% { opacity: 0.55; }
-    50%      { opacity: 1; }
+
+@keyframes qgDotPulse {
+    0%, 100% { opacity: 0.55; transform: scale(0.9); }
+    50%      { opacity: 1; transform: scale(1.1); }
 }
 
 .qg-entrance {
@@ -80,10 +81,10 @@ footer,
 
 @media (prefers-reduced-motion: reduce) {
     .qg-entrance { animation: none !important; opacity: 1 !important; transform: none !important; }
-    .qg-pulse, .qg-flow-arrow { animation: none !important; }
     * { transition-duration: 0.01ms !important; }
 }
 
+/* ------------------------------------------------------------------ brand */
 .qg-header {
     text-align: center;
     margin-bottom: 2.2rem;
@@ -122,157 +123,7 @@ footer,
     margin: 0;
 }
 
-.qg-flow-card {
-    position: relative;
-    margin: 0 auto 0.9rem;
-    max-width: 460px;
-    background: rgba(255, 255, 255, 0.72);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border: 1px solid var(--qg-border);
-    border-radius: var(--qg-radius-lg);
-    padding: 1.5rem 1.6rem;
-    text-align: center;
-    box-shadow: var(--qg-shadow);
-    transition: transform 0.24s var(--qg-ease), box-shadow 0.24s var(--qg-ease), border-color 0.24s var(--qg-ease);
-}
-.qg-flow-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--qg-border-hover);
-    box-shadow: var(--qg-shadow-hover);
-}
-.qg-flow-card h3 {
-    margin: 0 0 0.4rem;
-    font-size: 1.18rem;
-    font-weight: 700;
-    color: var(--qg-text);
-    letter-spacing: -0.01em;
-}
-.qg-flow-card .qg-support {
-    margin: 0;
-    color: var(--qg-text-muted);
-    font-size: 0.92rem;
-}
-.qg-flow-card::before {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    border-radius: var(--qg-radius-lg);
-    background: linear-gradient(135deg, rgba(36,87,230,0.18), rgba(96,165,250,0.05), transparent 70%);
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 0.3s var(--qg-ease);
-}
-.qg-flow-card:hover::before { opacity: 1; }
-
-.qg-down-arrow {
-    text-align: center;
-    margin-bottom: 1rem;
-    color: var(--qg-primary);
-}
-.qg-down-arrow svg {
-    animation: qgFlowPulse 1.6s var(--qg-ease) infinite;
-}
-
-.qg-bridge {
-    width: 100%;
-    margin: 0 0 0.6rem;
-    opacity: 0.9;
-}
-.qg-bridge svg { width: 100%; height: 36px; display: block; }
-.qg-flow-line {
-    stroke-dasharray: 6 6;
-    animation: qgArrowPulse 2.2s ease-in-out infinite;
-}
-
-.qg-role-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.25rem;
-    margin-bottom: 2rem;
-}
-@media (max-width: 640px) {
-    .qg-role-grid { grid-template-columns: 1fr; gap: 1rem; }
-}
-
-.qg-role-card {
-    border-radius: var(--qg-radius-md);
-    padding: 1.35rem 1.4rem;
-    color: #E8EDF7;
-    box-shadow: var(--qg-shadow);
-    transition: transform 0.24s var(--qg-ease), box-shadow 0.24s var(--qg-ease), border-color 0.24s var(--qg-ease);
-    border: 1px solid rgba(255,255,255,0.08);
-    position: relative;
-    overflow: hidden;
-}
-.qg-role-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--qg-shadow-hover);
-}
-.qg-role-card h4 {
-    margin: 0 0 0.75rem;
-    font-size: 1.05rem;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.qg-role-card .qg-badge {
-    font-size: 0.72rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    padding: 3px 8px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.12);
-    margin-left: auto;
-}
-.qg-feature-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.45rem;
-}
-.qg-feature-list li {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.9rem;
-    color: rgba(232, 237, 247, 0.9);
-}
-.qg-feature-list li::before {
-    content: '';
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    flex: 0 0 6px;
-}
-
-.qg-role-admin {
-    background: linear-gradient(155deg, #1E293B 0%, #0F172A 100%);
-}
-.qg-role-admin h4 { color: #BFDBFE; }
-.qg-role-admin .qg-feature-list li::before { background: var(--qg-secondary); }
-.qg-role-admin:hover { border-color: rgba(96, 165, 250, 0.45); }
-
-.qg-role-employee {
-    background: linear-gradient(155deg, #0F2420 0%, #0B1A17 100%);
-}
-.qg-role-employee h4 { color: #A7F3D0; }
-.qg-role-employee .qg-feature-list li::before { background: var(--qg-teal); }
-.qg-role-employee:hover { border-color: rgba(13, 148, 136, 0.45); }
-
-.qg-role-caption {
-    margin: 0.9rem 0 0;
-    font-size: 0.78rem;
-    color: var(--qg-text-muted);
-    text-align: center;
-    font-style: italic;
-}
-
+/* ------------------------------------------------------------ form fields */
 [data-testid="stVerticalBlockBorderWrapper"] {
     background: var(--qg-surface) !important;
     border: 1px solid var(--qg-border) !important;
@@ -332,24 +183,39 @@ footer,
     outline-offset: 2px !important;
 }
 
+/* ----------------------------------------------------------------- alerts */
+[data-testid="stAlert"] {
+    background: var(--qg-bg-alt) !important;
+    border: 1px solid var(--qg-border-hover) !important;
+    border-radius: 12px !important;
+    color: var(--qg-primary-dark) !important;
+    font-size: 0.88rem !important;
+    padding: 0.7rem 0.9rem !important;
+}
+[data-testid="stAlert"] [data-testid="stMarkdownContainer"] p {
+    color: var(--qg-primary-dark) !important;
+}
+
+/* ------------------------------------------------------------------- note */
 .qg-note {
     text-align: center;
     color: var(--qg-text-muted);
     font-size: 0.82rem;
     margin-top: 0.6rem;
+    line-height: 1.5;
 }
 .qg-note .qg-dot {
     display: inline-block;
     width: 7px; height: 7px;
     border-radius: 50%;
-    background: var(--qg-teal);
+    background: var(--qg-primary);
     margin-right: 6px;
     vertical-align: middle;
+    animation: qgDotPulse 2.4s var(--qg-ease) infinite;
 }
 
 @media (max-width: 640px) {
     .block-container { padding-left: 1rem !important; padding-right: 1rem !important; }
-    .qg-flow-card { padding: 1.25rem 1.15rem; }
 }
 </style>
 """
