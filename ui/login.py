@@ -457,7 +457,7 @@ html, body, [data-testid="stAppViewContainer"] {
 /* -------------------------------------------------------- floating cards */
 .qg-stage {
     position: relative;
-    height: 332px;
+    height: 435px;
     flex: 0 0 auto;
     margin-bottom: 0.6rem;
 }
@@ -465,20 +465,27 @@ html, body, [data-testid="stAppViewContainer"] {
     position: absolute;
     animation: qgCardIn 0.75s var(--qg-ease) both;
 }
-.qg-card-wrap--sales    { top: 0;     left: 0;   width: 412px; z-index: 2; animation-delay: 0.12s; }
-.qg-card-wrap--insights { top: 108px; left: 35%; width: 348px; z-index: 3; animation-delay: 0.26s; }
-.qg-card-wrap--regions  { top: 206px; left: 1%;  width: 348px; z-index: 4; animation-delay: 0.4s; }
+.qg-card-wrap--sales    { top: 0;     left: 0;   width: 432px; z-index: 2; animation-delay: 0.12s; }
+.qg-card-wrap--insights { top: 120px; left: 36%; width: 368px; z-index: 3; animation-delay: 0.26s; }
+.qg-card-wrap--regions  { top: 235px; left: 1%;  width: 368px; z-index: 4; animation-delay: 0.4s; }
 
 .qg-card {
     background: #FFFFFF;
     border-radius: 17px;
     border: 1px solid rgba(0, 63, 64, 0.06);
     box-shadow: 0 18px 38px rgba(0, 30, 31, 0.28);
-    padding: 0.85rem 1rem 0.9rem;
+    padding: 0.9rem 1.05rem 0.95rem;
     color: #173536;
+    display: flex;
+    flex-direction: column;
     animation: qgFloat 7.5s ease-in-out infinite alternate;
     transition: transform 0.3s var(--qg-ease), box-shadow 0.3s var(--qg-ease);
 }
+/* Every card keeps its own height budget and spreads its content evenly. */
+.qg-card-wrap--sales .qg-card    { min-height: 168px; justify-content: space-between; }
+.qg-card-wrap--insights .qg-card { min-height: 141px; justify-content: space-between; }
+.qg-card-wrap--regions .qg-card  { min-height: 193px; }
+.qg-card-wrap--regions .qg-regions { flex: 1 1 auto; justify-content: space-between; }
 .qg-card-wrap--sales .qg-card    { animation-delay: 0.12s, 0.6s; }
 .qg-card-wrap--insights .qg-card { animation-delay: 0.26s, 1.2s; }
 .qg-card-wrap--regions .qg-card  { animation-delay: 0.4s, 0.9s; }
@@ -880,9 +887,13 @@ html, body, [data-testid="stAppViewContainer"] {
 @media (max-width: 1100px) {
     .st-key-qg-auth-panel { padding: 2.2rem 2.1rem 1.9rem; }
     .st-key-qg-showcase { padding: 2.4rem 2rem 1.9rem; }
-    .qg-card-wrap--sales    { width: 320px; }
-    .qg-card-wrap--insights { width: 290px; left: 36%; }
-    .qg-card-wrap--regions  { width: 292px; }
+    .qg-stage { height: 390px; }
+    .qg-card-wrap--sales    { width: 340px; }
+    .qg-card-wrap--insights { width: 310px; left: 36%; top: 108px; }
+    .qg-card-wrap--regions  { width: 312px; top: 212px; }
+    .qg-card-wrap--sales .qg-card    { min-height: 150px; }
+    .qg-card-wrap--insights .qg-card { min-height: 128px; }
+    .qg-card-wrap--regions .qg-card  { min-height: 170px; }
     .qg-legend-item:nth-child(3) { display: none; }
 }
 
@@ -934,10 +945,12 @@ html, body, [data-testid="stAppViewContainer"] {
     .qg-welcome-title { font-size: 1.6rem; }
     .st-key-qg-auth-panel { padding: 1.5rem 1.1rem 1.3rem; }
     .st-key-qg-showcase { padding: 1.6rem 1.1rem 1.4rem; }
-    .qg-stage { height: 246px; }
+    .qg-stage { height: 262px; }
     .qg-card-wrap--sales    { width: 230px; }
-    .qg-card-wrap--insights { width: 190px; left: 45%; top: 102px; }
+    .qg-card-wrap--insights { width: 190px; left: 45%; top: 112px; }
     .qg-card-wrap--regions  { display: none; }
+    .qg-card-wrap--sales .qg-card    { min-height: 150px; }
+    .qg-card-wrap--insights .qg-card { min-height: 140px; }
     .qg-card { padding: 0.72rem 0.85rem 0.78rem; border-radius: 15px; }
     .qg-legend { flex-wrap: nowrap; gap: 9px; }
     .qg-legend-item { font-size: 0.54rem; }
@@ -952,17 +965,18 @@ html, body, [data-testid="stAppViewContainer"] {
 /* Short laptop screens: shrink the floating previews so the promo block and
    the decorative segments still fit on the panel. */
 @media (max-height: 820px) and (min-width: 901px) {
-    .st-key-qg-showcase { padding: 2.2rem 2.2rem 1.7rem; }
-    .qg-stage { height: 296px; }
-    .qg-card-wrap { scale: 0.74; transform-origin: top left; }
-    .qg-card-wrap--insights { top: 84px; left: 40%; }
-    .qg-card-wrap--regions  { top: 158px; }
-    .qg-promo { padding: 0.2rem 0 0.5rem; }
-    .qg-promo-tile { width: 46px; height: 46px; border-radius: 14px; }
-    .qg-promo-tile svg { width: 22px; height: 22px; }
-    .qg-promo-title { font-size: 1.22rem; margin-top: 0.8rem; }
-    .qg-promo-text { font-size: 0.8rem; margin-top: 0.45rem; }
-    .qg-sample-note { margin-top: 0.55rem; }
+    .st-key-qg-showcase { padding: 2rem 2.2rem 1.6rem; }
+    .qg-stage { height: 303px; }
+    .qg-card-wrap { scale: 0.7; transform-origin: top left; }
+    .qg-card-wrap--insights { top: 92px; left: 40%; }
+    .qg-card-wrap--regions  { top: 176px; }
+    .qg-promo { padding: 0.1rem 0 0.3rem; }
+    .qg-promo-tile { width: 40px; height: 40px; border-radius: 13px; }
+    .qg-promo-tile svg { width: 19px; height: 19px; }
+    .qg-promo-title { font-size: 1.06rem; margin-top: 0.6rem; max-width: 20rem; }
+    .qg-promo-text { font-size: 0.74rem; margin-top: 0.35rem; max-width: 22rem; }
+    .qg-sample-note { margin-top: 0.45rem; font-size: 0.55rem; }
+    .qg-segments { gap: 5px; margin-top: 0.35rem; }
 }
 </style>
 """
