@@ -39,7 +39,7 @@ for _ui_module in (UI.login, UI.theme):
 
 UI.theme.inject_theme()
 
-# The login prototype is the default view. The sibling `UI/registration.py`
-# module is intentionally kept separate so genuine authentication and
-# account registration can be wired in here later without rebuilding the UI.
+''' The login prototype is the default view. The sibling `UI/registration.py`
+module is intentionally kept separate so genuine authentication and
+account registration can be wired in here later without rebuilding the UI.'''
 UI.login.render_login()
