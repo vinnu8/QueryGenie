@@ -7,8 +7,8 @@ from pathlib import Path
 
 import streamlit as st
 
-import ui.login
-import ui.theme
+import UI.login
+import UI.theme
 
 
 def _reload_if_changed(module) -> None:
@@ -34,12 +34,12 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-for _ui_module in (ui.login, ui.theme):
+for _ui_module in (UI.login, UI.theme):
     _reload_if_changed(_ui_module)
 
-ui.theme.inject_theme()
+UI.theme.inject_theme()
 
-# The login prototype is the default view. The sibling `ui/registration.py`
+# The login prototype is the default view. The sibling `UI/registration.py`
 # module is intentionally kept separate so genuine authentication and
 # account registration can be wired in here later without rebuilding the UI.
-ui.login.render_login()
+UI.login.render_login()
