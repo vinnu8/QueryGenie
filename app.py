@@ -16,7 +16,7 @@ def _reload_if_changed(module) -> None:
 
     Streamlit watches the project folder and reruns the script whenever a
     file changes, but an already imported module stays cached in
-    ``sys.modules``. Without this guard, edits inside ``ui/`` would only show
+    ``sys.modules``. Without this guard, edits inside ``UI/`` would only show
     up after restarting the server. Reloading on change keeps the live preview
     in sync with the files on disk
     """
