@@ -18,7 +18,7 @@ def _reload_if_changed(module) -> None:
     file changes, but an already imported module stays cached in
     ``sys.modules``. Without this guard, edits inside ``ui/`` would only show
     up after restarting the server. Reloading on change keeps the live preview
-    in sync with the files on disk.
+    in sync with the files on disk
     """
     source = Path(module.__file__)
     modified = source.stat().st_mtime
