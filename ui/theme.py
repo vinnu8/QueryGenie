@@ -1,232 +1,190 @@
-"""Shared visual theme for the QueryGenie UI prototypes.
-
-The palette is intentionally light and teal: white surfaces, a very light
-teal canvas, deep teal accents and a single bright teal for interactive
-elements. Dark panels and neon-on-black styling are avoided on purpose so
-the UI keeps a premium, modern SaaS feel.
-
-The colour tokens defined here are shared by every screen of the prototype so
-the split-screen login page and any future workspace view stay consistent.
-"""
+"""Visual theme for the QueryGenie dataset workspace."""
 
 from __future__ import annotations
 
 import streamlit as st
 
 
-CUSTOM_CSS = r"""
+WORKSPACE_CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
 :root {
-    --qg-bg: #FFFFFF;
-    --qg-bg-alt: #F4F8F8;
-    --qg-surface: #FFFFFF;
-    --qg-primary: #168C91;
-    --qg-primary-dark: #003F40;
-    --qg-deep: #003536;
-    --qg-secondary: #35B3B8;
-    --qg-soft: #E8F3F3;
-    --qg-text: #173536;
-    --qg-text-muted: #7B8588;
-    --qg-border: #E3E8E8;
-    --qg-border-hover: #BBDCDC;
-    --qg-shadow: 0 10px 40px rgba(0, 63, 64, 0.08);
-    --qg-shadow-hover: 0 18px 50px rgba(0, 63, 64, 0.14);
-    --qg-radius-lg: 20px;
-    --qg-radius-md: 14px;
-    --qg-radius-sm: 10px;
-    --qg-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --qg-ink: #202a2d;
+    --qg-muted: #738084;
+    --qg-border: #dfe5e5;
+    --qg-soft: #f4f7f7;
+    --qg-teal: #168c76;
+    --qg-teal-soft: #e5f3ef;
 }
 
 html, body, [data-testid="stAppViewContainer"] {
-    background:
-        radial-gradient(1000px 600px at 15% -10%, rgba(53, 179, 184, 0.10), transparent 60%),
-        radial-gradient(900px 600px at 85% 110%, rgba(22, 140, 145, 0.08), transparent 60%),
-        var(--qg-bg-alt) !important;
-    color: var(--qg-text);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f5f7f7 !important;
+    color: var(--qg-ink);
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
-
-[data-testid="stAppViewContainer"] > .main {
-    background: transparent !important;
-}
-
-/* The prototype ships a single full-screen surface, so the Streamlit
-   chrome (header, toolbar, menu, footer) is removed. */
-[data-testid="stHeader"],
-[data-testid="stToolbar"],
-[data-testid="stDecoration"],
-[data-testid="stStatusWidget"],
-footer,
-#MainMenu {
+[data-testid="stHeader"], [data-testid="stToolbar"], [data-testid="stDecoration"],
+[data-testid="stStatusWidget"], footer, #MainMenu {
     display: none !important;
-    visibility: hidden !important;
 }
+[data-testid="stMainBlockContainer"] {
+    max-width: 100% !important;
+    padding: 0.5rem 0.65rem 1rem !important;
+}
+[data-testid="stHorizontalBlock"] { gap: 0.65rem; }
+[data-testid="stVerticalBlock"] { gap: 0.65rem; }
 
-.block-container {
-    padding-top: 2.5rem !important;
-    padding-bottom: 3rem !important;
-    max-width: 920px !important;
-}
-
-@keyframes qgFadeSlideUp {
-    from { opacity: 0; transform: translateY(22px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes qgDotPulse {
-    0%, 100% { opacity: 0.55; transform: scale(0.9); }
-    50%      { opacity: 1; transform: scale(1.1); }
-}
-
-.qg-entrance {
-    animation: qgFadeSlideUp 0.7s var(--qg-ease) both;
-}
-.qg-delay-1 { animation-delay: 0.05s; }
-.qg-delay-2 { animation-delay: 0.15s; }
-.qg-delay-3 { animation-delay: 0.28s; }
-.qg-delay-4 { animation-delay: 0.42s; }
-
-@media (prefers-reduced-motion: reduce) {
-    .qg-entrance { animation: none !important; opacity: 1 !important; transform: none !important; }
-    * { transition-duration: 0.01ms !important; }
-}
-
-/* ------------------------------------------------------------------ brand */
-.qg-header {
-    text-align: center;
-    margin-bottom: 2.2rem;
-}
-.qg-logo {
-    display: inline-flex;
+.qg-brand {
+    display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 0.35rem;
+    gap: 0.55rem;
+    min-height: 2.2rem;
+    padding: 0 0.2rem 0.65rem;
+    border-bottom: 1px solid var(--qg-border);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 1.05rem;
+    font-weight: 700;
 }
-.qg-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, var(--qg-primary), var(--qg-secondary));
+.qg-brand-mark {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 8px 24px rgba(22, 140, 145, 0.26);
-    color: #FFFFFF;
+    width: 1.55rem;
+    height: 1.55rem;
+    border-radius: 0.42rem;
+    color: white;
+    background: var(--qg-teal);
+    font-family: sans-serif;
 }
-.qg-icon svg { width: 22px; height: 22px; }
-.qg-wordmark {
-    font-size: 1.85rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    color: var(--qg-text);
+.qg-section-label {
+    color: #3d4a4e;
+    font-size: 0.76rem;
+    font-weight: 650;
+    letter-spacing: 0.035em;
+    text-transform: uppercase;
 }
-.qg-subtitle {
-    color: var(--qg-text-muted);
-    font-size: 0.98rem;
+.qg-dataset-card {
+    padding: 0.68rem;
+    border: 1px solid #d6ebe5;
+    border-radius: 0.5rem;
+    background: var(--qg-teal-soft);
+    overflow-wrap: anywhere;
+}
+.qg-dataset-name {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.78rem;
+    font-weight: 650;
+}
+.qg-dataset-meta, .qg-muted {
+    color: var(--qg-muted);
+    font-size: 0.73rem;
+}
+.qg-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-height: 2.45rem;
+    padding: 0 0.2rem 0.2rem;
+    border-bottom: 1px solid var(--qg-border);
+}
+.qg-crumb {
+    color: #506065;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.78rem;
+}
+.qg-panel {
+    min-height: calc(100vh - 4.2rem);
+    padding: 0.7rem;
+    border: 1px solid var(--qg-border);
+    border-radius: 0.55rem;
+    background: white;
+}
+.qg-title {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+.qg-table-label {
+    color: #465459;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.76rem;
+}
+.qg-schema-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.66rem;
+}
+.qg-schema-table th, .qg-schema-table td {
+    padding: 0.27rem 0.14rem;
+    border-bottom: 1px solid #edf0f0;
+    text-align: left;
+    overflow-wrap: anywhere;
+}
+.qg-schema-table th:first-child, .qg-schema-table td:first-child {
+    width: 58%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.qg-schema-table th:nth-child(2), .qg-schema-table td:nth-child(2) { width: 27%; }
+.qg-schema-table th:last-child, .qg-schema-table td:last-child { width: 15%; }
+.qg-schema-table th {
+    color: #738084;
+    font-size: 0.6rem;
     font-weight: 500;
-    margin: 0;
+    text-transform: uppercase;
+}
+.qg-schema-table td:last-child, .qg-schema-table th:last-child { text-align: right; }
+.qg-divider {
+    height: 1px;
+    margin: 0.6rem 0;
+    background: var(--qg-border);
 }
 
-/* ------------------------------------------------------------ form fields */
-[data-testid="stVerticalBlockBorderWrapper"] {
-    background: var(--qg-surface) !important;
-    border: 1px solid var(--qg-border) !important;
-    border-radius: var(--qg-radius-lg) !important;
-    padding: 1.7rem 1.7rem 1.4rem !important;
-    box-shadow: var(--qg-shadow) !important;
-    animation: qgFadeSlideUp 0.7s var(--qg-ease) both;
-    animation-delay: 0.42s;
-    transition: border-color 0.24s var(--qg-ease), box-shadow 0.24s var(--qg-ease);
+/* Compact controls keep the three-column workspace usable at laptop widths. */
+[data-testid="stTextInput"] input, [data-testid="stTextArea"] textarea {
+    border-color: var(--qg-border) !important;
+    border-radius: 0.35rem !important;
+    font-size: 0.8rem !important;
 }
-[data-testid="stVerticalBlockBorderWrapper"]:hover {
-    border-color: var(--qg-border-hover);
-    box-shadow: var(--qg-shadow-hover);
+[data-testid="stButton"] button, [data-testid="stPopover"] button {
+    min-height: 2rem;
+    border-color: var(--qg-border);
+    border-radius: 0.35rem;
+    font-size: 0.76rem;
 }
-
-[data-testid="stTextInput"] input,
-[data-testid="stNumberInput"] input {
-    border-radius: var(--qg-radius-sm) !important;
-    border: 1px solid var(--qg-border) !important;
-    background: #FFFFFF !important;
-    color: var(--qg-text) !important;
-    padding: 0.6rem 0.85rem !important;
-    transition: border-color 0.2s var(--qg-ease), box-shadow 0.2s var(--qg-ease);
+[data-testid="stButton"] button[kind="primary"] {
+    border-color: var(--qg-teal) !important;
+    background: var(--qg-teal) !important;
 }
-[data-testid="stTextInput"] input:focus {
-    border-color: var(--qg-primary) !important;
-    box-shadow: 0 0 0 3px rgba(22, 140, 145, 0.15) !important;
-    outline: none !important;
+div[class*="st-key-qg_dataset_"] button[kind="primary"] {
+    border-color: #d6ebe5 !important;
+    background: var(--qg-teal-soft) !important;
+    color: var(--qg-ink) !important;
 }
-[data-testid="stTextInput"] label,
-[data-testid="stCheckbox"] label {
-    color: var(--qg-text) !important;
-    font-weight: 500 !important;
-    font-size: 0.92rem !important;
+[data-testid="stFileUploader"] section {
+    padding: 0.65rem;
+    border-color: var(--qg-border);
+    border-radius: 0.4rem;
+}
+[data-testid="stDataFrame"] {
+    border: 1px solid var(--qg-border);
+    border-radius: 0.35rem;
+}
+[data-testid="stTabs"] button {
+    font-size: 0.78rem;
 }
 
-[data-testid="stButton"] button {
-    background: linear-gradient(135deg, var(--qg-primary), var(--qg-secondary)) !important;
-    color: #FFFFFF !important;
-    border: none !important;
-    border-radius: var(--qg-radius-sm) !important;
-    font-weight: 600 !important;
-    padding: 0.62rem 1.1rem !important;
-    box-shadow: 0 8px 24px rgba(22, 140, 145, 0.24) !important;
-    transition: transform 0.18s var(--qg-ease), box-shadow 0.18s var(--qg-ease), filter 0.18s var(--qg-ease) !important;
-}
-[data-testid="stButton"] button:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 12px 30px rgba(22, 140, 145, 0.32) !important;
-    filter: brightness(1.05) !important;
-}
-[data-testid="stButton"] button:active {
-    transform: translateY(0) scale(0.985) !important;
-}
-[data-testid="stButton"] button:focus-visible {
-    outline: 3px solid rgba(22, 140, 145, 0.35) !important;
-    outline-offset: 2px !important;
-}
-
-/* ----------------------------------------------------------------- alerts */
-[data-testid="stAlert"] {
-    background: var(--qg-soft) !important;
-    border: 1px solid var(--qg-border-hover) !important;
-    border-radius: 12px !important;
-    color: var(--qg-primary-dark) !important;
-    font-size: 0.88rem !important;
-    padding: 0.7rem 0.9rem !important;
-}
-[data-testid="stAlert"] [data-testid="stMarkdownContainer"] p {
-    color: var(--qg-primary-dark) !important;
-}
-
-/* ------------------------------------------------------------------- note */
-.qg-note {
-    text-align: center;
-    color: var(--qg-text-muted);
-    font-size: 0.82rem;
-    margin-top: 0.6rem;
-    line-height: 1.5;
-}
-.qg-note .qg-dot {
-    display: inline-block;
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: var(--qg-primary);
-    margin-right: 6px;
-    vertical-align: middle;
-    animation: qgDotPulse 2.4s var(--qg-ease) infinite;
-}
-
-@media (max-width: 640px) {
-    .block-container { padding-left: 1rem !important; padding-right: 1rem !important; }
+@media (max-width: 900px) {
+    [data-testid="stMainBlockContainer"] { padding: 0.4rem !important; }
+    .qg-panel { min-height: auto; }
 }
 </style>
 """
 
 
 def inject_theme() -> None:
-    """Inject the shared QueryGenie theme CSS into the Streamlit page."""
-    st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
+    """Inject the workspace styles."""
+    st.markdown(WORKSPACE_CSS, unsafe_allow_html=True)
