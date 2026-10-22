@@ -46,6 +46,28 @@ class QueryServiceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "one statement|not allowed|SQL query"):
             run_query(self.frame, self.table_name, sql)
 
+    def test_workspace_starts_without_a_dataset(self) -> None:
+        from unittest.mock import patch
+
+        from UI import workspace
+
+        class FakeSessionState(dict):
+            def __getattr__(self, key: str):
+                try:
+                    return self[key]
+                except KeyError as error:
+                    raise AttributeError(key) from error
+
+            def __setattr__(self, key: str, value: object) -> None:
+                self[key] = value
+
+        state = FakeSessionState()
+        with patch.object(workspace.st, "session_state", state):
+            workspace._initialize_workspace({"id": 1, "name": "Jane Doe", "email": "jane@example.com"})
+
+        self.assertEqual(state["qg_datasets"], {})
+        self.assertIsNone(state["qg_selected_dataset"])
+
 
 if __name__ == "__main__":
     unittest.main()

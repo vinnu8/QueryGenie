@@ -12,27 +12,28 @@ import streamlit as st
 from services.datasets import (
     MAX_PREVIEW_ROWS,
     MAX_UPLOAD_BYTES,
-    load_sample_dataset,
     read_uploaded_dataset,
     schema_rows,
     table_name_for_dataset,
 )
+from services.auth import User
 from services.query import generate_sql, run_query
 
 
-SAMPLE_FILENAME = "global_ecommerce_sales.csv"
 DEFAULT_SQL = "SELECT * FROM {table} LIMIT 100"
 
 
-def _initialize_workspace() -> None:
-    if "qg_datasets" not in st.session_state:
-        st.session_state.qg_datasets = {SAMPLE_FILENAME: load_sample_dataset()}
-    if "qg_selected_dataset" not in st.session_state:
-        st.session_state.qg_selected_dataset = SAMPLE_FILENAME
-    if "qg_sample_filename" not in st.session_state:
-        st.session_state.qg_sample_filename = SAMPLE_FILENAME
-    if "qg_query_history" not in st.session_state:
+def _initialize_workspace(user: User) -> None:
+    if st.session_state.get("qg_dataset_owner") != user["id"]:
+        st.session_state.qg_dataset_owner = user["id"]
+        st.session_state.qg_datasets = {}
+        st.session_state.qg_selected_dataset = None
         st.session_state.qg_query_history = []
+        st.session_state.qg_query_result = None
+        st.session_state.qg_processed_uploads = set()
+        st.session_state.pop("qg_workspace_view", None)
+        st.session_state.pop("sql_editor", None)
+        st.session_state.pop("qg_editor_dataset", None)
 
 
 def _unique_filename(filename: str, datasets: dict[str, pd.DataFrame]) -> str:
@@ -49,22 +50,21 @@ def _unique_filename(filename: str, datasets: dict[str, pd.DataFrame]) -> str:
         counter += 1
 
 
-def _render_upload() -> None:
+def _render_upload(key: str) -> None:
     uploaded = st.file_uploader(
         "Upload CSV",
         type=["csv"],
         help=f"CSV files only, up to {MAX_UPLOAD_BYTES // (1024 * 1024)} MB.",
         label_visibility="collapsed",
-        key="qg_upload",
+        key=key,
     )
     if uploaded is None:
         return
 
     content = uploaded.getvalue()
     upload_id = hashlib.sha256(uploaded.name.encode("utf-8") + content).hexdigest()
-    if st.session_state.get("qg_last_upload") == upload_id:
+    if upload_id in st.session_state.qg_processed_uploads:
         return
-    st.session_state.qg_last_upload = upload_id
     try:
         frame = read_uploaded_dataset(uploaded.name, content)
     except ValueError as error:
@@ -75,11 +75,12 @@ def _render_upload() -> None:
     filename = _unique_filename(uploaded.name, datasets)
     datasets[filename] = frame
     st.session_state.qg_selected_dataset = filename
+    st.session_state.qg_processed_uploads.add(upload_id)
     st.session_state.qg_upload_notice = f"{filename} uploaded."
     st.rerun()
 
 
-def _render_dataset_rail() -> None:
+def _render_dataset_rail(user: User) -> None:
     datasets: dict[str, pd.DataFrame] = st.session_state.qg_datasets
     st.markdown(
         '<div class="qg-brand"><span class="qg-brand-mark">⌕</span>QueryGenie</div>',
@@ -87,31 +88,44 @@ def _render_dataset_rail() -> None:
     )
     st.markdown('<div class="qg-section-label">Datasets</div>', unsafe_allow_html=True)
 
-    for index, (filename, frame) in enumerate(datasets.items()):
-        selected = filename == st.session_state.qg_selected_dataset
-        label = f"{'▣' if selected else '▱'}  {filename}"
-        if st.button(
-            label,
-            key=f"qg_dataset_{index}",
-            help=f"{len(frame):,} rows · {len(frame.columns)} columns",
-            type="primary" if selected else "secondary",
-            use_container_width=True,
-        ):
-            st.session_state.qg_selected_dataset = filename
-            st.rerun()
-        if selected:
-            st.markdown(
-                f'<div class="qg-dataset-card"><div class="qg-dataset-meta">'
-                f'{len(frame):,} rows · {len(frame.columns)} cols · active</div></div>',
-                unsafe_allow_html=True,
-            )
+    if not datasets:
+        st.markdown('<div class="qg-empty-rail">No datasets yet</div>', unsafe_allow_html=True)
+    else:
+        for index, (filename, frame) in enumerate(datasets.items()):
+            selected = filename == st.session_state.qg_selected_dataset
+            label = f"{'▣' if selected else '▱'}  {filename}"
+            if st.button(
+                label,
+                key=f"qg_dataset_{index}",
+                help=f"{len(frame):,} rows · {len(frame.columns)} columns",
+                type="primary" if selected else "secondary",
+                use_container_width=True,
+            ):
+                st.session_state.qg_selected_dataset = filename
+                st.rerun()
+            if selected:
+                st.markdown(
+                    f'<div class="qg-dataset-card"><div class="qg-dataset-meta">'
+                    f'{len(frame):,} rows · {len(frame.columns)} cols · active</div></div>',
+                    unsafe_allow_html=True,
+                )
 
     st.markdown("")
-    _render_upload()
+    _render_upload("qg_upload")
     notice = st.session_state.pop("qg_upload_notice", None)
     if notice:
         st.caption(notice)
-    st.caption("Your files stay in this browser session.")
+    st.markdown('<div class="qg-user-card">', unsafe_allow_html=True)
+    st.markdown(
+        f'<div class="qg-user-name">{html.escape(user["name"])}</div>'
+        f'<div class="qg-user-email" title="{html.escape(user["email"])}">'
+        f'{html.escape(user["email"])}</div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown("</div>", unsafe_allow_html=True)
+    if st.button("Sign out", key="qg_signout", use_container_width=True):
+        st.session_state.clear()
+        st.rerun()
 
 
 def _render_dataset_actions(filename: str) -> None:
@@ -145,22 +159,19 @@ def _render_dataset_actions(filename: str) -> None:
                     st.rerun()
     with delete_column:
         with st.popover("Delete", use_container_width=True):
-            if filename == st.session_state.qg_sample_filename:
-                st.caption("The sample dataset is kept for demonstrations.")
-            else:
-                st.warning(f"Remove {filename} from this session?")
-                if st.button("Delete dataset", key="qg_confirm_delete", type="primary"):
-                    datasets.pop(filename)
-                    st.session_state.qg_query_history = [
-                        item
-                        for item in st.session_state.qg_query_history
-                        if item["filename"] != filename
-                    ]
-                    query_result = st.session_state.get("qg_query_result")
-                    if query_result and query_result["filename"] == filename:
-                        st.session_state.qg_query_result = None
-                    st.session_state.qg_selected_dataset = next(iter(datasets))
-                    st.rerun()
+            st.warning(f"Remove {filename} from this session?")
+            if st.button("Delete dataset", key="qg_confirm_delete", type="primary"):
+                datasets.pop(filename)
+                st.session_state.qg_query_history = [
+                    item
+                    for item in st.session_state.qg_query_history
+                    if item["filename"] != filename
+                ]
+                query_result = st.session_state.get("qg_query_result")
+                if query_result and query_result["filename"] == filename:
+                    st.session_state.qg_query_result = None
+                st.session_state.qg_selected_dataset = next(iter(datasets), None)
+                st.rerun()
 
 
 def _render_preview(frame: pd.DataFrame) -> None:
@@ -323,44 +334,97 @@ def _render_schema_panel(filename: str, frame: pd.DataFrame, table_name: str) ->
             st.code(item["sql"], language="sql")
 
 
-def render_workspace() -> None:
-    """Render the complete local dataset workspace."""
-    _initialize_workspace()
+def _render_empty_workspace() -> None:
+    st.markdown(
+        '<div class="qg-empty-state"><div class="qg-empty-icon">↑</div>'
+        '<div class="qg-empty-title">Your workspace is ready</div>'
+        '<div class="qg-empty-copy">Upload a CSV file to preview your records, explore its schema, '
+        'and ask questions about your data.</div></div>',
+        unsafe_allow_html=True,
+    )
+    _render_upload("qg_empty_upload")
+
+
+def _render_empty_schema_panel() -> None:
+    st.markdown('<div class="qg-section-label">Dataset Schema</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="qg-empty-aside">Your column names, data types, and query history '
+        'will appear here after you upload a dataset.</div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown('<div class="qg-divider"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="qg-section-label">Query History</div>', unsafe_allow_html=True)
+    st.caption("Queries you run appear here.")
+
+
+def render_workspace(user: User) -> None:
+    """Render the authenticated dataset workspace."""
+    _initialize_workspace(user)
     datasets: dict[str, pd.DataFrame] = st.session_state.qg_datasets
     selected_filename = st.session_state.qg_selected_dataset
     if selected_filename not in datasets:
-        selected_filename = next(iter(datasets))
+        selected_filename = next(iter(datasets), None)
         st.session_state.qg_selected_dataset = selected_filename
-    frame = datasets[selected_filename]
-    table_name = table_name_for_dataset(selected_filename)
-
-    left, center, right = st.columns([1.55, 6.1, 1.75], gap="small")
+    frame = datasets.get(selected_filename) if selected_filename else None
+    table_name = table_name_for_dataset(selected_filename) if selected_filename else ""
+    left, center, right = st.columns([1.65, 6.1, 2.25], gap="medium")
     with left:
-        with st.container(border=True):
-            _render_dataset_rail()
+        with st.container(key="qg-rail-panel"):
+            _render_dataset_rail(user)
     with center:
-        with st.container(border=True):
-            st.markdown(
-                f'<div class="qg-header"><span class="qg-crumb">Workspace&nbsp; / &nbsp;'
-                f'{html.escape(selected_filename)}</span><span class="qg-muted">Local session</span></div>',
-                unsafe_allow_html=True,
-            )
-            title_column, action_column = st.columns([4.7, 2], vertical_alignment="center")
-            with title_column:
-                st.markdown(f'<div class="qg-title">{html.escape(selected_filename)}</div>', unsafe_allow_html=True)
+        with st.container(key="qg-main-panel"):
+            header_column, toggle_column = st.columns([5, 2], vertical_alignment="center")
+            with header_column:
+                breadcrumb = (
+                    f'Workspace&nbsp; / &nbsp;{html.escape(selected_filename)}'
+                    if selected_filename
+                    else "Workspace"
+                )
                 st.markdown(
-                    f'<div class="qg-muted">{len(frame.columns)} columns · {len(frame):,} rows · '
-                    f'table {html.escape(table_name)}</div>',
+                    f'<div class="qg-crumb">{breadcrumb}</div>',
                     unsafe_allow_html=True,
                 )
-            with action_column:
-                _render_dataset_actions(selected_filename)
-
-            schema_tab, query_tab = st.tabs(["Schema", "Query"])
-            with schema_tab:
-                _render_preview(frame)
-            with query_tab:
-                _render_query_tab(selected_filename, frame, table_name)
+            with toggle_column:
+                active_view = st.segmented_control(
+                    "Workspace view",
+                    ["Schema", "Query"],
+                    selection_mode="single",
+                    default="Schema",
+                    label_visibility="collapsed",
+                    key="qg_workspace_view",
+                    width="stretch",
+                )
+            if frame is None or selected_filename is None:
+                st.markdown('<div class="qg-divider"></div>', unsafe_allow_html=True)
+                if active_view == "Schema":
+                    _render_empty_workspace()
+                else:
+                    st.markdown(
+                        '<div class="qg-empty-state"><div class="qg-empty-title">'
+                        'Upload a dataset to start querying</div><div class="qg-empty-copy">'
+                        'Your questions and SQL editor will be ready as soon as your CSV is uploaded.</div></div>',
+                        unsafe_allow_html=True,
+                    )
+                    _render_upload("qg_empty_upload")
+            else:
+                title_column, action_column = st.columns([4.7, 2], vertical_alignment="center")
+                with title_column:
+                    st.markdown(f'<div class="qg-title">{html.escape(selected_filename)}</div>', unsafe_allow_html=True)
+                    st.markdown(
+                        f'<div class="qg-muted">{len(frame.columns)} columns · {len(frame):,} rows · '
+                        f'table {html.escape(table_name)}</div>',
+                        unsafe_allow_html=True,
+                    )
+                with action_column:
+                    _render_dataset_actions(selected_filename)
+                st.markdown('<div class="qg-divider"></div>', unsafe_allow_html=True)
+                if active_view == "Schema":
+                    _render_preview(frame)
+                else:
+                    _render_query_tab(selected_filename, frame, table_name)
     with right:
-        with st.container(border=True):
-            _render_schema_panel(selected_filename, frame, table_name)
+        with st.container(key="qg-schema-panel"):
+            if frame is None or selected_filename is None:
+                _render_empty_schema_panel()
+            else:
+                _render_schema_panel(selected_filename, frame, table_name)

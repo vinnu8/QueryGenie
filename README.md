@@ -1,8 +1,8 @@
 # QueryGenie
 
-QueryGenie is a local, session-based dataset workspace. It opens directly to the
-workspace shown in the design reference, with a dataset rail, table preview,
-schema panel, query editor, and query history.
+QueryGenie is a Streamlit workspace for exploring your own CSV files. New
+visitors sign in or create an account before reaching a clean, empty workspace.
+The first step is uploading a CSV; no demo dataset is bundled or loaded.
 
 ## Run locally
 
@@ -11,11 +11,13 @@ python -m pip install -r requirements.txt
 streamlit run app.py
 ```
 
-The bundled `global_ecommerce_sales.csv` is loaded as the demonstration
-dataset. Uploaded CSV files (up to 10 MB) and query history stay in the active
-Streamlit session; there is no MySQL connection or persistent user database.
-The sample dataset cannot be deleted. User-uploaded datasets can be renamed or
-removed from the session.
+Accounts are stored locally in the ignored `.querygenie.sqlite3` SQLite file.
+Passwords are salted and hashed with PBKDF2-HMAC-SHA256. No MySQL connection
+or external account service is required.
+
+Uploaded datasets and query history stay in the active browser session and
+aren't written to disk. Each signed-in session starts with an empty dataset
+library. CSV uploads are limited to 10 MB. Datasets can be renamed or removed.
 
 The question helper generates SQL for common requests such as “top 5 products
 by profit” and “total sales by region”. It is a local helper rather than a

@@ -27,10 +27,28 @@ html, body, [data-testid="stAppViewContainer"] {
 }
 [data-testid="stMainBlockContainer"] {
     max-width: 100% !important;
-    padding: 0.5rem 0.65rem 1rem !important;
+    padding: 1rem 1.25rem 1.25rem !important;
 }
-[data-testid="stHorizontalBlock"] { gap: 0.65rem; }
-[data-testid="stVerticalBlock"] { gap: 0.65rem; }
+[data-testid="stHorizontalBlock"] { gap: 1rem; }
+[data-testid="stVerticalBlock"] { gap: 0.85rem; }
+[data-testid="stVerticalBlockBorderWrapper"] {
+    border-color: var(--qg-border) !important;
+    border-radius: 0.75rem !important;
+    background: white !important;
+    padding: 1.1rem !important;
+}
+.st-key-qg-rail-panel, .st-key-qg-main-panel, .st-key-qg-schema-panel {
+    min-height: calc(100vh - 2.5rem);
+    padding: 0.8rem;
+    border: 1px solid var(--qg-border);
+    border-radius: 0.75rem;
+    background: white;
+}
+.st-key-qg-rail-panel {
+    display: flex;
+    flex-direction: column;
+}
+.st-key-qg-rail-panel > [data-testid="stVerticalBlock"] { min-height: inherit; }
 
 .qg-brand {
     display: flex;
@@ -62,7 +80,8 @@ html, body, [data-testid="stAppViewContainer"] {
     text-transform: uppercase;
 }
 .qg-dataset-card {
-    padding: 0.68rem;
+    margin-top: 0.35rem;
+    padding: 0.7rem;
     border: 1px solid #d6ebe5;
     border-radius: 0.5rem;
     background: var(--qg-teal-soft);
@@ -86,6 +105,61 @@ html, body, [data-testid="stAppViewContainer"] {
     padding: 0 0.2rem 0.2rem;
     border-bottom: 1px solid var(--qg-border);
 }
+.qg-empty-rail {
+    padding: 0.7rem 0.15rem;
+    color: var(--qg-muted);
+    font-size: 0.82rem;
+}
+.qg-user-card {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--qg-border);
+}
+.qg-user-name {
+    color: var(--qg-ink);
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+.qg-user-email {
+    overflow: hidden;
+    margin-top: 0.25rem;
+    color: var(--qg-muted);
+    font-size: 0.7rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.qg-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    padding: clamp(2rem, 8vh, 5rem) 1.5rem 2rem;
+    text-align: center;
+}
+.qg-empty-icon {
+    display: flex;
+    width: 3rem;
+    height: 3rem;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #cde5de;
+    border-radius: 0.85rem;
+    background: var(--qg-teal-soft);
+    color: var(--qg-teal);
+    font-size: 1.4rem;
+}
+.qg-empty-title {
+    color: var(--qg-ink);
+    font-size: 1.25rem;
+    font-weight: 650;
+}
+.qg-empty-copy, .qg-empty-aside {
+    max-width: 34rem;
+    color: var(--qg-muted);
+    font-size: 0.88rem;
+    line-height: 1.65;
+}
+.qg-empty-aside { margin-top: 0.9rem; }
 .qg-crumb {
     color: #506065;
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -142,18 +216,46 @@ html, body, [data-testid="stAppViewContainer"] {
     margin: 0.6rem 0;
     background: var(--qg-border);
 }
+.qg-auth-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin: 1.5rem 0 1.2rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+.qg-auth-heading {
+    margin: 0.5rem 0;
+    color: var(--qg-ink);
+    font-size: 1.65rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+}
+.qg-auth-description {
+    margin-bottom: 1.5rem;
+    color: var(--qg-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+.st-key-qg-rail-panel button {
+    min-height: 2.65rem;
+    text-align: left;
+}
+.st-key-qg-rail-panel [data-testid="stFileUploader"] {
+    margin: 0.45rem 0 0.8rem;
+}
 
-/* Compact controls keep the three-column workspace usable at laptop widths. */
 [data-testid="stTextInput"] input, [data-testid="stTextArea"] textarea {
     border-color: var(--qg-border) !important;
-    border-radius: 0.35rem !important;
-    font-size: 0.8rem !important;
+    border-radius: 0.45rem !important;
+    font-size: 0.88rem !important;
+    padding: 0.65rem 0.75rem !important;
 }
 [data-testid="stButton"] button, [data-testid="stPopover"] button {
-    min-height: 2rem;
+    min-height: 2.4rem;
     border-color: var(--qg-border);
-    border-radius: 0.35rem;
-    font-size: 0.76rem;
+    border-radius: 0.45rem;
+    font-size: 0.82rem;
 }
 [data-testid="stButton"] button[kind="primary"] {
     border-color: var(--qg-teal) !important;
@@ -165,21 +267,32 @@ div[class*="st-key-qg_dataset_"] button[kind="primary"] {
     color: var(--qg-ink) !important;
 }
 [data-testid="stFileUploader"] section {
-    padding: 0.65rem;
+    padding: 0.9rem;
     border-color: var(--qg-border);
-    border-radius: 0.4rem;
+    border-radius: 0.55rem;
 }
 [data-testid="stDataFrame"] {
     border: 1px solid var(--qg-border);
     border-radius: 0.35rem;
 }
-[data-testid="stTabs"] button {
-    font-size: 0.78rem;
+[data-testid="stSegmentedControl"] {
+    justify-content: flex-end;
+}
+[data-testid="stSegmentedControl"] button {
+    min-height: 2.4rem;
+    font-size: 0.84rem;
 }
 
 @media (max-width: 900px) {
-    [data-testid="stMainBlockContainer"] { padding: 0.4rem !important; }
-    .qg-panel { min-height: auto; }
+    [data-testid="stMainBlockContainer"] { padding: 0.65rem !important; }
+    .st-key-qg-rail-panel, .st-key-qg-main-panel, .st-key-qg-schema-panel {
+        min-height: auto;
+    }
+}
+@media (max-width: 680px) {
+    [data-testid="stHorizontalBlock"] { gap: 0.75rem; }
+    .st-key-qg-main-panel, .st-key-qg-rail-panel, .st-key-qg-schema-panel { padding: 0.85rem; }
+    .qg-auth-heading { font-size: 1.4rem; }
 }
 </style>
 """

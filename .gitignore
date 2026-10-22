@@ -2,3 +2,7 @@ __pycache__/
 .venv/
 venv/
 .env
+.querygenie.sqlite3
+.querygenie.sqlite3-shm
+.querygenie.sqlite3-wal
+*.py[cod]
