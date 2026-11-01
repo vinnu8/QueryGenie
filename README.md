@@ -1,6 +1,6 @@
 # QueryGenie
 
-QueryGenie is a Streamlit workspace for exploring your own CSV files. New
+QueryGenie is a Query Builder for exploring your own CSV files. New
 visitors sign in or create an account before reaching a clean, empty workspace.
 The first step is uploading a CSV; no demo dataset is bundled or loaded.
 
